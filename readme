@@ -1,0 +1,12 @@
+Security Considerations on SYN timeout:
+Incomplete handshakes can be exploited by attackers, such as in SYN flooding attacks, where a server is overwhelmed with incomplete SYN requests, causing it to allocate resources for connections that will never be completed.
+
+To mitigate this:
+
+Limit the Number of Concurrent Half-Open Connections: Implement limits on how many incomplete handshakes the server will tolerate at once.
+Use SYN Cookies: A more advanced technique used in real-world TCP implementations to prevent resource exhaustion from SYN floods. SYN cookies allow the server to avoid allocating resources until the handshake is completed.
+
+
+
+
+
