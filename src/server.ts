@@ -1,30 +1,39 @@
-// import net from "net";
-
-// const server = net.createServer((socket: net.Socket) => {
-//    console.log("Client connected");
-
-//    // Handle incoming messages from clients.
-//    socket.on("data", (data: Buffer) => {
-//       console.log(`Received: ${data.toString()}`);
-
-//       socket.write("Echo: " + data);
-//    });
-
-//    // Handle client disconnects.
-//    socket.on("end", () => {
-//       console.log("Client disconnected");
-//    });
-
-//    // Handle errors
-//    socket.on("error", (err: Error) => {
-//       console.error(`Socket error: ${err.message}`);
-//    });
-// });
-
 import * as net from "net";
 
-const server = net.createServer((socket: any) => {
-   console.log(socket instanceof net.Socket); // This will log `true`
+const server = net.createServer((socket: net.Socket) => {
+   console.log("Client connected");
+
+   socket.on("data", (data: Buffer) => {
+      const message = JSON.parse(data.toString());
+
+      handleThreeWayHandshake(socket, message);
+
+      // Placeholder
+      if (message.type === "DATA") {
+         console.log(`Received data: ${message.data}`);
+      }
+   });
+
+   socket.on("end", () => {
+      console.log("Client disconnected");
+   });
+
+   socket.on("error", (err: Error) => {
+      console.error(`Socket error: ${err.message}`);
+   });
 });
 
-server.listen(8080);
+const handleThreeWayHandshake = (socket: net.Socket, message: any) => {
+   if (message.type === "SYN") {
+      console.log("Received SYN from client. Sending SYN-ACK...");
+      socket.write(
+         JSON.stringify({ type: "SYN-ACK", seq: 0, ack: message.seq + 1 })
+      );
+   } else if (message.type === "ACK") {
+      console.log("Received ACK from client. Connection established.");
+   }
+};
+
+server.listen(8080, () => {
+   console.log("Server listening on port 8080");
+});
