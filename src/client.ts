@@ -2,13 +2,19 @@ import * as net from "net";
 
 const PORT = 8080;
 
-const sequenceNumber = 0;
+const sequenceNumber = Math.floor(Math.random() * 1000);
 let retries = 0;
 const maxRetries = 3;
 
+// syn as part of the three-way handshake
+const sendSyn = () => {
+   console.log("Sending SYN to server...");
+   client.write(JSON.stringify({ type: "SYN", seq: sequenceNumber }));
+   client.setTimeout(3000); // 3-second timeout waiting for SYN-ACK from server
+};
+
 // Create a new client connection
 const client = net.createConnection({ port: PORT }, () => {
-   // Send SYN to server as part of the 3-way handshake
    sendSyn();
 });
 
@@ -17,9 +23,13 @@ client.on("data", (data: Buffer) => {
 
    if (message.type === "SYN-ACK") {
       console.log("Received SYN-ACK from server. Sending ACK...");
+
       client.write(
          JSON.stringify({ type: "ACK", seq: message.ack, ack: message.seq + 1 })
       );
+
+      client.setTimeout(0);
+      console.log("Connection established.");
    }
 });
 
@@ -41,8 +51,3 @@ client.on("timeout", () => {
       client.end();
    }
 });
-
-const sendSyn = () => {
-   client.setTimeout(3000); // 3-second timeout for the SYN-ACK
-   client.write(JSON.stringify({ type: "SYN", seq: sequenceNumber }));
-};

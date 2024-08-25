@@ -1,8 +1,6 @@
 import * as net from "net";
 
 const server = net.createServer((socket: net.Socket) => {
-   console.log("Client connected");
-
    socket.on("data", (data: Buffer) => {
       const message = JSON.parse(data.toString());
 
@@ -40,6 +38,9 @@ const handleThreeWayHandshake = (socket: net.Socket, message: any) => {
    } else if (message.type === "ACK") {
       socket.setTimeout(0); // Disable the timeout
       console.log("Received ACK from client. Connection established.");
+   } else {
+      console.log("Invalid message type. Closing connection.");
+      socket.end();
    }
 };
 
