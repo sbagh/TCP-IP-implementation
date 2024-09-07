@@ -16,16 +16,14 @@ export class TCPHandshake {
       this.maxRetries = maxRetries;
    }
 
-   // Initiate the handshake process
    public initiate() {
       console.log("Sending SYN...");
       this.socket.write(
          JSON.stringify({ type: "SYN", seq: this.sequenceNumber })
       );
-      this.socket.setTimeout(3000); // 3-second timeout waiting for SYN-ACK from server
+      this.socket.setTimeout(3000); 
    }
 
-   // Handle incoming messages during handshake
    public handleResponse(message: any) {
       switch (message.type) {
          case "SYN":
@@ -45,12 +43,12 @@ export class TCPHandshake {
                   ack: message.seq + 1,
                })
             );
-            this.socket.setTimeout(0); // Disable the timeout
+            this.socket.setTimeout(0); 
             console.log("Connection established.");
             break;
 
          case "ACK":
-            this.socket.setTimeout(0); // Disable the timeout
+            this.socket.setTimeout(0); 
             console.log("Received ACK. Connection established.");
             break;
 
@@ -60,7 +58,6 @@ export class TCPHandshake {
       }
    }
 
-   // Handle timeout during handshake
    public handleTimeout() {
       if (this.retries < this.maxRetries) {
          this.retries++;
